@@ -1,8 +1,8 @@
-import List from 'List';
+import List from '../models/List';
 
-const getAllListsByUser = async(req, res) => {
+const getAllListsByUserId = async(req, res) => {
     try{
-        const {userId} = req.user.id;
+        const userId = req.user.id;
     
         const lists = List.find({userId: userId}).lean();
 
@@ -54,7 +54,7 @@ const addList = async(req, res) => {
 const changeListName = async(req, res) => {
     try{
         const userId = req.user.id;
-        const {id} = req.params;
+        const {listId} = req.params;
         const {name} = req.body;
 
         if (!name){
@@ -67,7 +67,7 @@ const changeListName = async(req, res) => {
 
         const updatedList = await List.findOneAndUpdate(
             {
-                _id: id,
+                _id: listId,
                 userId: userId
             },
             {
@@ -101,13 +101,34 @@ const changeListName = async(req, res) => {
     }
 }
 
+const getListById = async(req, res) => {
+    try{
+        const userId = req.user.id;
+        const {listId} = req.params;
+
+        const list = List.findOne({_id: listId, userId: userId}).lean();
+
+        res
+        .status(200)
+        .json(list);
+    }
+    catch (err){
+        res
+        .status(500)
+        .json({
+            message: 'Error fetching list',
+            error: err.message
+        });
+    }
+};
+
 const deleteList = async(req, res) => {
     try{
         const userId = req.user.id;
-        const {id} = req.params;
+        const {listId} = req.params;
         
         const list = List.findOne({
-            _id: id,
+            _id: listId,
             userId: userId
         });
 

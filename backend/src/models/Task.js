@@ -11,6 +11,10 @@ const taskSchema = new mongoose.Schema({
     isCompleted:{
         type: Boolean,
         required: true
+    },
+    userId: {
+        type: mongoose.Schema.types.objectId,
+        required: true
     }
 },{
     timestamps: true
