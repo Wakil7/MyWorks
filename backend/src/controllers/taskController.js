@@ -14,9 +14,8 @@ const addTask = async(req, res) => {
         if (!name){
             await session.abortTransaction();
             session.endSession();
-            res
-            .status(400)
-            .json({
+            return res.status(400).json({
+                success: false,
                 message: 'Name is required'
             })
         }
@@ -38,18 +37,16 @@ const addTask = async(req, res) => {
         if (!updatedList){
             await session.abortTransaction();
             session.endSession();
-            res
-            .status(404)
-            .json({
+            return res.status(404).json({
+                success: false,
                 message: 'List not found or you are not authorized'
             })
         }
 
         await session.commitTransaction();
         session.endSession();
-        res
-        .status(201)
-        .json({
+        return res.status(201).json({
+            success: true,
             message: 'Task added successfully',
             task: newTask,
             list: updatedList
@@ -58,9 +55,8 @@ const addTask = async(req, res) => {
     catch (err){
         await session.abortTransaction();
         session.endSession();
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Error adding task',
             error: err.message
         });
@@ -82,9 +78,8 @@ const deleteTask = async(req, res) => {
         if (!deletedTask){
             await session.abortTransaction();
             session.endSession();
-            res
-            .status(500)
-            .json({
+            return res.status(500).json({
+                success: false,
                 message: 'Failed to delete task'
             })
         }
@@ -100,7 +95,8 @@ const deleteTask = async(req, res) => {
         await session.commitTransaction();
         session.endSession();
 
-        res.status(200).json({
+        return res.status(200).json({
+            success: true,
             message: 'Task deleted successfully',
             task: deletedTask
         });
@@ -109,9 +105,8 @@ const deleteTask = async(req, res) => {
     catch (err){
         await session.abortTransaction();
         session.endSession();
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Failed to delete task',
             error: err.message
         })
@@ -126,7 +121,8 @@ const updateTask = async(req, res) => {
         const {name, description} = req.body;
 
         if (!name){
-            req.status(400).json({
+            return res.status(400).json({
+                success: false,
                 message: 'Name is reqiured'
             });
         }
@@ -141,17 +137,20 @@ const updateTask = async(req, res) => {
             {new: true, runValidators:true}
         );
         if (!updatedTask){
-            res.status(404).json({
+            return res.status(404).json({
+                success: false,
                 message: 'Task not found or unauthorized'
             })
         }
-        res.status(200).json({
+        return res.status(200).json({
+            success: true,
             message: 'Task updated successfully',
             task: updatedTask
         });
     }
     catch(err){
-        res.json(500).json({
+        return res.json(500).json({
+            success: false,
             message: 'Failed to update task',
             error: err.message
         })
@@ -179,20 +178,30 @@ const toggleTaskCompleted = async(req, res) => {
         });
 
         if (!updatedTask){
-            res.status(404).json({
+            return res.status(404).json({
+                success: false,
                 message: 'Task not found or unauthorized'
             })
         }
 
-        res.status(200).json({
+        return res.status(200).json({
+            success: true,
             message: 'Task updated successfully'
         });
     }
     catch(err){
-        res.status(500).json({
+        return res.status(500).json({
+            success: false,
             message: 'Failed to update task',
             error: err.message
         })
     }
+};
+
+module.exports = {
+    addTask,
+    deleteTask,
+    updateTask,
+    toggleTaskCompleted
 };
 

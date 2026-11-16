@@ -6,14 +6,15 @@ const getAllListsByUserId = async(req, res) => {
     
         const lists = List.find({userId: userId}).lean();
 
-        res
-        .status(200)
-        .json(lists);
+        return res.status(200).json({
+            success: true,
+            message: 'Lists fetched successfully',
+            lists: lists
+        });
     }
     catch (err){
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Error fetching user lists',
             error: err.message
         });
@@ -25,9 +26,8 @@ const addList = async(req, res) => {
         const userId = req.user.id;
         const {name} = req.body;
         if (!name){
-            res
-            .status(400)
-            .json({
+            return res.status(400).json({
+                success: false,
                 message:'Name is required'
             });
         }
@@ -37,14 +37,15 @@ const addList = async(req, res) => {
             userId
         });
 
-        res
-        .status(201)
-        .json(newList);
+        return res.status(201).json({
+            success: true,
+            message: 'List created successfully',
+            list: newList,
+        });
     }
     catch (err){
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Error adding new list',
             error: err.message
         });
@@ -58,9 +59,8 @@ const changeListName = async(req, res) => {
         const {name} = req.body;
 
         if (!name){
-            res
-            .status(400)
-            .json({
+            return res.status(400).json({
+                success: false,
                 message: 'Name is required'
             });
         }
@@ -80,21 +80,21 @@ const changeListName = async(req, res) => {
         ).lean();
 
         if (!updatedList){
-            res
-            .status(404)
-            .json({
+            return res.status(404).json({
+                success: false,
                 message: 'List not found or unauthorized'
             })
         }
 
-        res
-        .status(200)
-        .json(updatedList);
+        return res.status(200).json({
+            success: true,
+            message: 'List updated successfully',
+            updatedList
+        });
     }
     catch(err){
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Error changing list name',
             error: err.message
         });
@@ -108,14 +108,15 @@ const getListById = async(req, res) => {
 
         const list = List.findOne({_id: listId, userId: userId}).lean();
 
-        res
-        .status(200)
-        .json(list);
+        return res.status(200).json({
+            success: true,
+            message: 'List fetched successfully',
+            list: list
+        });
     }
     catch (err){
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Error fetching list',
             error: err.message
         });
@@ -133,35 +134,39 @@ const deleteList = async(req, res) => {
         });
 
         if (!list){
-            res
-            .status(404)
-            .json({
+            return res.status(404).json({
+                success: false,
                 message: 'List not found or unauthorized'
             })
         }
 
         if (list.tasks.length>0){
-            res
-            .status(400)
-            .json({
+            return res.status(400).json({
+                success: false,
                 message: 'Cannot delete this list as there are tasks inside it'
             });
         }
 
         await list.deleteOne();
 
-        res
-        .status(200)
-        .json({
+        return res.status(200).json({
+            success: true,
             message: 'List deleted succesfully'
         });
     }
     catch (err){
-        res
-        .status(500)
-        .json({
+        return res.status(500).json({
+            success: false,
             message: 'Error deleting list',
             error: err.message
         });
     }
-}
+};
+
+module.exports = {
+    getAllListsByUserId,
+    addList,
+    changeListName,
+    getListById,
+    deleteList
+};
