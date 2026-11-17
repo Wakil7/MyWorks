@@ -1,4 +1,4 @@
-import List from '../models/List';
+import List from '../models/List.js';
 
 const getAllListsByUserId = async(req, res) => {
     try{
@@ -163,7 +163,7 @@ const deleteList = async(req, res) => {
     }
 };
 
-module.exports = {
+export {
     getAllListsByUserId,
     addList,
     changeListName,

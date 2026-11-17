@@ -1,13 +1,13 @@
 import mongoose from 'mongoose';
-import List from '../models/List';
-import Task from '../models/Task';
+import List from '../models/List.js';
+import Task from '../models/Task.js';
 
 const addTask = async(req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
         const userId = req.user.id;
-        const {taskId} = req.params;
+        const {listId} = req.params;
 
         const {name, description} = req.body;
 
@@ -29,7 +29,7 @@ const addTask = async(req, res) => {
 
 
         const updatedList = await List.findOneAndUpdate(
-            { _id:taskId, userId:userId}, 
+            { _id:listId, userId:userId}, 
             { $push: {tasks: newTask._id}},
             {new: true, session}
         );
@@ -198,7 +198,7 @@ const toggleTaskCompleted = async(req, res) => {
     }
 };
 
-module.exports = {
+export {
     addTask,
     deleteTask,
     updateTask,

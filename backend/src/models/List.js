@@ -6,13 +6,13 @@ const listSchema = new mongoose.Schema({
         required: true
     },
     userId: {
-        type: mongoose.Schema.types.objectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     tasks: [
         {
-            type: mongoose.Schema.types.objectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'Task'
         }
     ]
@@ -21,6 +21,5 @@ const listSchema = new mongoose.Schema({
 });
 
 const List = mongoose.model('List', listSchema);
-module.exports = {
-    List
-};
+
+export default List;

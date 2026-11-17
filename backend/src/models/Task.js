@@ -13,7 +13,7 @@ const taskSchema = new mongoose.Schema({
         required: true
     },
     userId: {
-        type: mongoose.Schema.types.objectId,
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     }
 },{
@@ -21,6 +21,5 @@ const taskSchema = new mongoose.Schema({
 });
 
 const Task = mongoose.model('Task', taskSchema);
-module.exports = {
-    Task
-};
+
+export default Task;
