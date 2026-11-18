@@ -2,16 +2,17 @@ import mongoose from 'mongoose';
 import List from '../models/List.js';
 import Task from '../models/Task.js';
 
-const addTask = async(req, res) => {
+const addTask = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-    try{
+    try {
         const userId = req.user.id;
-        const {listId} = req.params;
+        const { listId } = req.params;
 
-        const {name, description} = req.body;
+        const { name, description } = req.body;
 
-        if (!name){
+
+        if (!name) {
             await session.abortTransaction();
             session.endSession();
             return res.status(400).json({
@@ -20,21 +21,22 @@ const addTask = async(req, res) => {
             })
         }
 
-        const newTask = await Task.create({
+        const newTask = new Task({
             name,
             description,
             userId,
             isCompleted: false
-        }, {session});
+        });
 
+        await newTask.save({ session });
 
         const updatedList = await List.findOneAndUpdate(
-            { _id:listId, userId:userId}, 
-            { $push: {tasks: newTask._id}},
-            {new: true, session}
+            { _id: listId, userId: userId },
+            { $push: { tasks: newTask._id } },
+            { new: true, session }
         );
 
-        if (!updatedList){
+        if (!updatedList) {
             await session.abortTransaction();
             session.endSession();
             return res.status(404).json({
@@ -52,7 +54,7 @@ const addTask = async(req, res) => {
             list: updatedList
         })
     }
-    catch (err){
+    catch (err) {
         await session.abortTransaction();
         session.endSession();
         return res.status(500).json({
@@ -63,19 +65,19 @@ const addTask = async(req, res) => {
     }
 };
 
-const deleteTask = async(req, res) => {
+const deleteTask = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
-    try{
-        const {listId, taskId} = req.params;
+    try {
+        const { listId, taskId } = req.params;
         const userId = req.user.id;
 
         const deletedTask = Task.findOneAndDelete({
             _id: taskId,
             userId: userId
-        }, {session});
+        }, { session });
 
-        if (!deletedTask){
+        if (!deletedTask) {
             await session.abortTransaction();
             session.endSession();
             return res.status(500).json({
@@ -87,9 +89,9 @@ const deleteTask = async(req, res) => {
         await List.findByIdAndUpdate(
             listId,
             {
-                $pull: {tasks: deletedTask._id}
+                $pull: { tasks: deletedTask._id }
             },
-            {session}
+            { session }
         )
 
         await session.commitTransaction();
@@ -102,7 +104,7 @@ const deleteTask = async(req, res) => {
         });
 
     }
-    catch (err){
+    catch (err) {
         await session.abortTransaction();
         session.endSession();
         return res.status(500).json({
@@ -113,14 +115,14 @@ const deleteTask = async(req, res) => {
     }
 };
 
-const updateTask = async(req, res) => {
-    try{
+const updateTask = async (req, res) => {
+    try {
         const userId = req.user.id;
-        const {taskId} = req.params;
+        const { taskId } = req.params;
 
-        const {name, description} = req.body;
+        const { name, description } = req.body;
 
-        if (!name){
+        if (!name) {
             return res.status(400).json({
                 success: false,
                 message: 'Name is reqiured'
@@ -128,15 +130,15 @@ const updateTask = async(req, res) => {
         }
 
         const updatedTask = await Task.findOneAndUpdate({
-                _id: taskId,
-                userId: userId
-            },
+            _id: taskId,
+            userId: userId
+        },
             {
-                $set: {name:name, description:description}
+                $set: { name: name, description: description }
             },
-            {new: true, runValidators:true}
+            { new: true, runValidators: true }
         );
-        if (!updatedTask){
+        if (!updatedTask) {
             return res.status(404).json({
                 success: false,
                 message: 'Task not found or unauthorized'
@@ -148,7 +150,7 @@ const updateTask = async(req, res) => {
             task: updatedTask
         });
     }
-    catch(err){
+    catch (err) {
         return res.json(500).json({
             success: false,
             message: 'Failed to update task',
@@ -157,27 +159,27 @@ const updateTask = async(req, res) => {
     }
 };
 
-const toggleTaskCompleted = async(req, res) => {
-    try{
+const toggleTaskCompleted = async (req, res) => {
+    try {
         const userId = req.user.id;
-        const {taskId} = req.params;
+        const { taskId } = req.params;
 
         const updatedTask = await Task.findOneAndUpdate({
             _id: taskId,
             userId: userId
         },
-        [
-            {
-                $set: {
-                    isCompleted: {$not: 'isCompleted'}
+            [
+                {
+                    $set: {
+                        isCompleted: { $not: 'isCompleted' }
+                    }
                 }
-            }
-        ],
-        {
-            new: true
-        });
+            ],
+            {
+                new: true
+            });
 
-        if (!updatedTask){
+        if (!updatedTask) {
             return res.status(404).json({
                 success: false,
                 message: 'Task not found or unauthorized'
@@ -189,7 +191,7 @@ const toggleTaskCompleted = async(req, res) => {
             message: 'Task updated successfully'
         });
     }
-    catch(err){
+    catch (err) {
         return res.status(500).json({
             success: false,
             message: 'Failed to update task',
