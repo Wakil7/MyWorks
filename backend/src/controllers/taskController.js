@@ -3,8 +3,8 @@ import List from '../models/List.js';
 import Task from '../models/Task.js';
 
 const addTask = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    // const session = await mongoose.startSession();
+    // session.startTransaction();
     try {
         const userId = req.user.id;
         const { listId } = req.params;
@@ -13,40 +13,43 @@ const addTask = async (req, res) => {
 
 
         if (!name) {
-            await session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction();
+            // session.endSession();
             return res.status(400).json({
                 success: false,
                 message: 'Name is required'
             })
         }
 
-        const newTask = new Task({
+        const newTask = await Task.create({
             name,
             description,
             userId,
             isCompleted: false
         });
 
-        await newTask.save({ session });
+        // await newTask.save({ session });
 
         const updatedList = await List.findOneAndUpdate(
             { _id: listId, userId: userId },
             { $push: { tasks: newTask._id } },
-            { new: true, session }
+            { 
+                new: true, 
+                // session 
+            }
         );
 
         if (!updatedList) {
-            await session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction();
+            // session.endSession();
             return res.status(404).json({
                 success: false,
                 message: 'List not found or you are not authorized'
             })
         }
 
-        await session.commitTransaction();
-        session.endSession();
+        // await session.commitTransaction();
+        // session.endSession();
         return res.status(201).json({
             success: true,
             message: 'Task added successfully',
@@ -55,8 +58,8 @@ const addTask = async (req, res) => {
         })
     }
     catch (err) {
-        await session.abortTransaction();
-        session.endSession();
+        // await session.abortTransaction();
+        // session.endSession();
         return res.status(500).json({
             success: false,
             message: 'Error adding task',

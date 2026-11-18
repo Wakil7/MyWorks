@@ -1,9 +1,11 @@
 
 import { useState } from 'react';
+import {useNavigate} from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
+import api from '../api/axios.js'
 
-export default function Signup() {
+export default function SignUp() {
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -13,20 +15,35 @@ export default function Signup() {
         bestFriendName: ''
     });
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+    const navigate = useNavigate();
+
+    const onChange = (e) => {
+        setFormData((prevData)=>{
+            return {...prevData, [e.target.name]:e.target.value};
         });
-    };
+    }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
+        // console.log(formData);
 
-        console.log("Signup Data:", formData);
+        try{
+            const response = await api.post('/api/v1/user/register', formData);
+            
+            if (response.data.success){
+                navigate('/login');
+                console.log(response.data.message);
+            }
+            else{
+                console.log('Error');
+            }
 
-        // Later, send this data to the backend API
-    };
+        }
+        catch (error){
+            console.log(error.response.data.message);
+        }
+
+    }
 
     return (
         <div className="container py-5">
@@ -44,7 +61,7 @@ export default function Signup() {
                                 Sign up to get started
                             </p>
 
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit = {handleSubmit}>
 
                                 <div className="row">
                                     <div className="col-md-6">
@@ -53,7 +70,7 @@ export default function Signup() {
                                             name="firstName"
                                             placeholder="Enter first name"
                                             value={formData.firstName}
-                                            onChange={handleChange}
+                                            onChange={onChange}
                                         />
                                     </div>
 
@@ -63,7 +80,7 @@ export default function Signup() {
                                             name="lastName"
                                             placeholder="Enter last name"
                                             value={formData.lastName}
-                                            onChange={handleChange}
+                                            onChange={onChange}
                                         />
                                     </div>
                                 </div>
@@ -74,7 +91,7 @@ export default function Signup() {
                                     name="email"
                                     placeholder="Enter email address"
                                     value={formData.email}
-                                    onChange={handleChange}
+                                    onChange={onChange}
                                 />
 
                                 <FormInput
@@ -83,7 +100,7 @@ export default function Signup() {
                                     name="password"
                                     placeholder="Create a password"
                                     value={formData.password}
-                                    onChange={handleChange}
+                                    onChange={onChange}
                                 />
 
                                 <hr className="my-4" />
@@ -97,7 +114,7 @@ export default function Signup() {
                                     name="bestFriendName"
                                     placeholder="Enter your best friend's name"
                                     value={formData.bestFriendName}
-                                    onChange={handleChange}
+                                    onChange={onChange}
                                 />
 
                                 <PrimaryButton>
