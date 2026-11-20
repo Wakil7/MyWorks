@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import cookieOptions from '../utils/cookieOptions.js';
 
 const registerUser = async(req, res) => {
     try{
@@ -86,11 +87,15 @@ const loginUser = async(req, res) => {
             {expiresIn: process.env.JWT_EXPIRES_IN}
         );
 
+        res.cookie("accessToken", token, {
+            ...cookieOptions,
+            maxAge: 7*24*60*60*1000
+        });
+
         return res.status(200).json({
             success: true,
             message: 'Login successful',
-            token,
-            data: {
+            user: {
                 userId: user._id,
                 firstName: user.firstName
             }
@@ -137,20 +142,26 @@ const getProfile = async(req, res) => {
     }
 };
 
+const logoutUser = async(req, res) => {
+    res.clearCookie("accessToken", cookieOptions);
+
+    res.status(200).json({
+        success: true,
+        message: "Logout Successful"
+    });
+};
+
 const updateProfile = async(req, res) => {
     try{
         const userId = req.user.id;
-        const {firstName, lastName, password, bestFriendName} = req.body;
+        const {firstName, lastName, bestFriendName} = req.body;
 
-        if (!firstName || !lastName || !password || !bestFriendName){
+        if (!firstName || !lastName || !bestFriendName){
             return res.status(400).json({
                 success: false,
                 message: 'Fields cannot be left blank'
             });
         }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -158,7 +169,6 @@ const updateProfile = async(req, res) => {
                 $set: {
                     firstName: firstName,
                     lastName: lastName,
-                    password: hashedPassword,
                     bestFriendName: bestFriendName
                 }
             },
@@ -254,5 +264,6 @@ export {
     loginUser,
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    logoutUser
 };

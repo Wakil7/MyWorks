@@ -2,16 +2,25 @@ import jwt from 'jsonwebtoken';
 
 const authenticate = async(req, res, next) => {
     try{
-        const authHeader = req.headers.authorization || req.headers.Authorization;
+        // const authHeader = req.headers.authorization || req.headers.Authorization;
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')){
+        const token = req.cookies?.accessToken;
+
+        // if (!authHeader || !authHeader.startsWith('Bearer ')){
+        //     return res.status(401).json({
+        //         success: false,
+        //         message: 'Access denied. Token not provided'
+        //     });
+        // }
+
+        if (!token){
             return res.status(401).json({
                 success: false,
                 message: 'Access denied. Token not provided'
             });
         }
 
-        const token = authHeader.split(' ')[1];
+        // const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         req.user = decoded;

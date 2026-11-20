@@ -1,5 +1,6 @@
 
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Navbar from './components/Navbar.jsx';
 import SignUp from './pages/SignUp.jsx';
 import Login from './pages/Login.jsx';
@@ -12,9 +13,12 @@ function App() {
         <BrowserRouter>
             <Navbar />
             <Routes>
-                <Route path="/" element={<Lists />}/>
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/" element={<Lists />}/>
+                </Route>
                 <Route path="/signup" element={<SignUp/>}/>
                 <Route path="/login" element={<Login/>}/>
+                <Route path="/forgot-password" element={<ForgotPassword/>}/>
             </Routes>
         </BrowserRouter>
     );

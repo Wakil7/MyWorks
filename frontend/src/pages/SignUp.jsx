@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {useNavigate} from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
-import api from '../api/axios.js'
+import api from '../api/axiosInstance.js'
 
 export default function SignUp() {
 

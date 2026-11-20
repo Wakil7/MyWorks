@@ -1,29 +1,45 @@
 
 import { useState } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {loginUser} from '../features/auth/authSlice.js';
+import {useNavigate, Link} from 'react-router-dom';
+// import api from '../api/axiosInstance.js'
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 
 export default function Login() {
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const {loading, error} = useSelector(
+        (state) => state.auth
+    );
+
     const [formData, setFormData] = useState({
         email: '',
-        password: ''
+        password: '' 
     });
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    const onChange = (e) => {
+        setFormData((prevData)=>{
+            return {...prevData, [e.target.name]:e.target.value};
+        })
+    }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
-
-        console.log("Login Data:", formData);
-
-        // Later, send this data to the backend API
+        try{
+            await dispatch(
+                loginUser(formData)
+            ).unwrap();
+            navigate("/", {replace: true});
+        }
+        catch (err){
+            console.error(err);
+        }
     };
+   
 
     return (
         <div className="container py-5">
@@ -49,7 +65,7 @@ export default function Login() {
                                     name="email"
                                     placeholder="Enter email address"
                                     value={formData.email}
-                                    onChange={handleChange}
+                                    onChange={onChange}
                                 />
 
                                 <FormInput
@@ -58,7 +74,7 @@ export default function Login() {
                                     name="password"
                                     placeholder="Enter your password"
                                     value={formData.password}
-                                    onChange={handleChange}
+                                    onChange={onChange}
                                 />
 
                                 <div className="text-end mb-3">
@@ -78,12 +94,11 @@ export default function Login() {
 
                             <p className="text-center mt-4 mb-0">
                                 Don't have an account?{' '}
-                                <a
-                                    href="/signup"
+                                <Link to="/signup"
                                     className="text-decoration-none"
                                 >
                                     Sign Up
-                                </a>
+                                </Link>
                             </p>
 
                         </div>

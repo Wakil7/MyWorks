@@ -1,8 +1,17 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import ListItem from '../components/ListItem';
 
 export default function Lists() {
+
+    const dispatch = useDispatch();
+    const {user} = useSelector((state)=>state.auth);
+
+
+    useEffect(()=>{
+        console.log(user);
+    }, [user]);
 
     const [lists, setLists] = useState([
         { id: 1, name: 'Shopping List' },

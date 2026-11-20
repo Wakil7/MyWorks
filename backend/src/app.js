@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import userRoute from './routes/userRoute.js';
 import taskRoute from './routes/taskRoute.js';
@@ -13,6 +14,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/tasks', taskRoute);
