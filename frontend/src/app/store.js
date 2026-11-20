@@ -1,12 +1,14 @@
 import {configureStore} from '@reduxjs/toolkit';
 
 import authReducer from '../features/auth/authSlice.js';
-// import dataReducer from '../features/data/dataSlice.js';
+import listReducer from '../features/data/listSlice.js';
+import taskReducer from '../features/data/taskSlice.js';
 
 const store = configureStore({
     reducer: {
         auth: authReducer,
-        // data: dataReducer
+        list: listReducer,
+        task: taskReducer
     }
 });
 

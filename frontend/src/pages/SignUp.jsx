@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, Link} from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import api from '../api/axiosInstance.js'
@@ -28,7 +28,7 @@ export default function SignUp() {
         // console.log(formData);
 
         try{
-            const response = await api.post('/api/v1/user/register', formData);
+            const response = await api.post('/user/register', formData);
             
             if (response.data.success){
                 navigate('/login');
@@ -125,9 +125,9 @@ export default function SignUp() {
 
                             <p className="text-center mt-4 mb-0">
                                 Already have an account?{' '}
-                                <a href="/login" className="text-decoration-none">
+                                <Link href="/login" className="text-decoration-none">
                                     Login
-                                </a>
+                                </Link>
                             </p>
 
                         </div>

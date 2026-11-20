@@ -1,7 +1,9 @@
 
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
+import axiosInstance from '../api/axiosInstance.js';
 
 export default function ForgotPassword() {
 
@@ -11,6 +13,8 @@ export default function ForgotPassword() {
         newPassword: ''
     });
 
+    const navigate = useNavigate();
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -18,12 +22,20 @@ export default function ForgotPassword() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
 
-        console.log("Password Reset Data:", formData);
+        try{
+            const response = await axiosInstance.post("/user/change-password", formData);
+            console.log(response.data.message);
+            navigate("/login");
+        }
+        catch (err){
+            console.log(err.response?.data?.message || "Failed to update password");
+        }
+        
 
-        // Later, send this data to the backend API
+        
     };
 
     return (
@@ -79,12 +91,12 @@ export default function ForgotPassword() {
 
                             <p className="text-center mt-4 mb-0">
                                 Remember your password?{' '}
-                                <a
-                                    href="/login"
+                                <Link
+                                    to="/login"
                                     className="text-decoration-none"
                                 >
                                     Login
-                                </a>
+                                </Link>
                             </p>
 
                         </div>

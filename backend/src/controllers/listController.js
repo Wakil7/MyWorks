@@ -4,7 +4,7 @@ const getAllListsByUserId = async(req, res) => {
     try{
         const userId = req.user.id;
     
-        const lists = List.find({userId: userId}).lean();
+        const lists = List.find({userId: userId}, {name: 1}).lean();
 
         return res.status(200).json({
             success: true,
@@ -40,7 +40,10 @@ const addList = async(req, res) => {
         return res.status(201).json({
             success: true,
             message: 'List created successfully',
-            list: newList,
+            list: {
+                _id: newList._id,
+                name: newList.name
+            },
         });
     }
     catch (err){
@@ -89,7 +92,10 @@ const changeListName = async(req, res) => {
         return res.status(200).json({
             success: true,
             message: 'List updated successfully',
-            updatedList
+            list: {
+                _id: updatedList._id,
+                name: updatedList.name
+            }
         });
     }
     catch(err){
