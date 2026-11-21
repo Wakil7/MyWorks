@@ -157,7 +157,8 @@ const deleteList = async(req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: 'List deleted succesfully'
+            message: 'List deleted succesfully',
+            list: list
         });
     }
     catch (err){

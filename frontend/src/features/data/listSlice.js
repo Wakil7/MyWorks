@@ -33,13 +33,10 @@ const addList = createAsyncThunk(
 
 const changeListName = createAsyncThunk(
     "list/changeName",
-    async ({idx, listId, name}, {rejectWithValue})=>{
+    async ({listId, name}, {rejectWithValue})=>{
         try{
             const response = await axios.patch(`/lists/change-name/${listId}`, {name});
-            return {
-                idx,
-                data: response.data.list
-            }
+            return response.data.list;
         }
         catch (err){
             return rejectWithValue(
@@ -51,10 +48,10 @@ const changeListName = createAsyncThunk(
 
 const deleteList = createAsyncThunk(
     "list/delete",
-    async ({idx, listId}, {rejectWithValue})=>{
+    async ({listId}, {rejectWithValue})=>{
         try{
-            await axiosInstance.delete(`/lists/delete/${listId}`);
-            return idx;
+            const response = await axiosInstance.delete(`/lists/delete/${listId}`);
+            return response.data.list;
         }
         catch (err){
             return rejectWithValue(
@@ -123,7 +120,7 @@ const listSlice = createSlice({
 
         .addCase(changeListName.fulfilled, (state, action)=>{
             state.loading = false;
-            state.lists[action.payload.idx] = action.payload.data;
+            state.lists = state.lists.map(list => list._id===action.payload._id?action.payload:list);
             state.error = null;
         })
 
@@ -139,7 +136,7 @@ const listSlice = createSlice({
 
         .addCase(deleteList.fulfilled, (state, action)=>{
             state.loading = false;
-            state.lists.splice(action.payload, 1);
+            state.lists = state.lists.filter(list => list._id !== action.payload._id);
             state.error = null;
         })
 
