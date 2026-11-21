@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk} from '@redux/toolkit';
 import axiosInstance from '../../api/axiosInstance.js';
 
 const getAllLists = createAsyncThunk(
-    "list/get-all",
+    "list/getAll",
     async(_, {rejectWithValue})=>{
         try{
             const response = await axiosInstance.get("/lists");
@@ -32,7 +32,7 @@ const addList = createAsyncThunk(
 );
 
 const changeListName = createAsyncThunk(
-    "list/change-name",
+    "list/changeName",
     async ({idx, listId, name}, {rejectWithValue})=>{
         try{
             const response = await axios.patch(`/lists/change-name/${listId}`, {name});

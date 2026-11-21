@@ -54,7 +54,6 @@ const addTask = async (req, res) => {
             success: true,
             message: 'Task added successfully',
             task: newTask,
-            list: updatedList
         })
     }
     catch (err) {
@@ -191,7 +190,8 @@ const toggleTaskCompleted = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: 'Task updated successfully'
+            message: 'Task updated successfully',
+            task: updatedTask
         });
     }
     catch (err) {

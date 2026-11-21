@@ -112,7 +112,7 @@ const getListById = async(req, res) => {
         const userId = req.user.id;
         const {listId} = req.params;
 
-        const list = List.findOne({_id: listId, userId: userId}).lean();
+        const list = List.findOne({_id: listId, userId: userId}).populate("tasks");
 
         return res.status(200).json({
             success: true,
