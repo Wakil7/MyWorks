@@ -1,4 +1,4 @@
-import {createSlice, createAsyncThunk} from '@redux/toolkit';
+import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axiosInstance from '../../api/axiosInstance.js';
 
 const getAllLists = createAsyncThunk(

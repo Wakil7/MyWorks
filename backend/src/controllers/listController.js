@@ -4,7 +4,7 @@ const getAllListsByUserId = async(req, res) => {
     try{
         const userId = req.user.id;
     
-        const lists = List.find({userId: userId}, {name: 1}).lean();
+        const lists = await List.find({userId: userId}, {name: 1}).lean();
 
         return res.status(200).json({
             success: true,
@@ -15,8 +15,7 @@ const getAllListsByUserId = async(req, res) => {
     catch (err){
         return res.status(500).json({
             success: false,
-            message: 'Error fetching user lists',
-            error: err.message
+            message: err.message
         });
     }
 };
@@ -112,7 +111,7 @@ const getListById = async(req, res) => {
         const userId = req.user.id;
         const {listId} = req.params;
 
-        const list = List.findOne({_id: listId, userId: userId}).populate("tasks");
+        const list = await List.findOne({_id: listId, userId: userId}).populate("tasks");
 
         return res.status(200).json({
             success: true,
@@ -134,7 +133,7 @@ const deleteList = async(req, res) => {
         const userId = req.user.id;
         const {listId} = req.params;
         
-        const list = List.findOne({
+        const list = await List.findOne({
             _id: listId,
             userId: userId
         });

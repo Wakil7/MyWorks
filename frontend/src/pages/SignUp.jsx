@@ -117,7 +117,7 @@ export default function SignUp() {
                                     onChange={onChange}
                                 />
 
-                                <PrimaryButton>
+                                <PrimaryButton type="submit">
                                     Create Account
                                 </PrimaryButton>
 

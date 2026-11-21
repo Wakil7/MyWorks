@@ -86,7 +86,7 @@ export default function Login() {
                                     </a>
                                 </div>
 
-                                <PrimaryButton>
+                                <PrimaryButton type="submit">
                                     Login
                                 </PrimaryButton>
 
