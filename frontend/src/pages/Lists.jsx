@@ -1,9 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ListItem from '../components/ListItem';
+import { useNavigate } from 'react-router-dom';
+import ListItem from '../components/Item.jsx';
 import TextInput from '../components/TextInput';
 import PrimaryButton from '../components/PrimaryButton';
+import ConfirmModal from '../components/ConfirmModal';
+import ListEditModal from '../components/ListEditModal'
 import {
     getAllLists,
     addList,
@@ -14,19 +17,25 @@ import {
 export default function Lists() {
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-    const { lists, loading, error } = useSelector((state) => state.list)
+    const { lists, loading, error } = useSelector((state) => state.list);
 
     const [listName, setListName] = useState("");
+    const [selectedListId, setSelectedListId] = useState(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    const [editListName, setEditListName] = useState("");
 
     useEffect(()=>{
         dispatch(getAllLists());
     }, []);
 
 
-    useEffect(() => {
-        console.log(user);
-    }, [user]);
+    // useEffect(() => {
+    //     console.log(user);
+    // }, [user]);
 
     useEffect(()=>{
         console.log(error);
@@ -40,20 +49,57 @@ export default function Lists() {
     //     { id: 5, name: 'Daily Tasks' }
     // ]);
 
-    const handleEdit = (listId) => {
+    const handleOnListClick = (listId) => {
+        navigate(`/tasks/${listId}`);
+    }
+
+    const handleEditClick = (listId, name) => {
         // console.log("Edit List:", id);
+        setSelectedListId(listId);
+        setEditListName(name);
+        setShowEditModal(true);
     };
 
-    const handleDelete = (listId) => {
-        dispatch(deleteList({listId}));
+    const handleConfirmEdit = () => {
+        dispatch(changeListName({listId: selectedListId, name: editListName}));
+        setSelectedListId(null);
+        setEditListName("");
+        setShowEditModal(false);
+    }
+
+    const handleCancelEdit = () => {
+        setSelectedListId(null);
+        setEditListName("");
+        setShowEditModal(false);
+    }
+
+    const handleDeleteClick = (listId) => {
+        setSelectedListId(listId);
+        setShowDeleteModal(true);
     };
+
+    const handleConfirmDelete = ()=>{
+        dispatch(deleteList({listId: selectedListId}));
+        setSelectedListId(null);
+        setShowDeleteModal(false);
+    }
+
+    const handleCancelDelete = ()=>{
+        setSelectedListId(null);
+        setShowDeleteModal(false);
+    }
 
     const handleInputChange = (e) => {
         setListName(e.target.value);
     }
 
+    const handleEditInputChange = (e) => {
+        setEditListName(e.target.value);
+    }
+
     const handleAddList = async()=>{
         dispatch(addList({name: listName}));
+        setListName("");
     }
 
     return (
@@ -82,8 +128,9 @@ export default function Lists() {
                         key={list._id}
                         number={index + 1}
                         name={list.name}
-                        onEdit={() => handleEdit(list._id)}
-                        onDelete={() => handleDelete(list._id)}
+                        onEdit={() => handleEditClick(list._id, list.name)}
+                        onDelete={() => handleDeleteClick(list._id)}
+                        onClick={() => handleOnListClick(list._id)}
                     />
                 ))}
 
@@ -94,6 +141,23 @@ export default function Lists() {
                 )}
 
             </div>
+
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                title="Delete List?"
+                message="Do you want to delete this list? This action cannot be undone"
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+            ></ConfirmModal>
+
+            <ListEditModal
+                isOpen={showEditModal}
+                title="Edit List"
+                onConfirm={handleConfirmEdit}
+                onCancel={handleCancelEdit}
+                inputOnChange={handleEditInputChange}
+                inputValue={editListName}
+            ></ListEditModal>
 
         </div>
     );

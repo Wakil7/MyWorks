@@ -68,20 +68,22 @@ const addTask = async (req, res) => {
 };
 
 const deleteTask = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    // const session = await mongoose.startSession();
+    // session.startTransaction();
     try {
         const { listId, taskId } = req.params;
         const userId = req.user.id;
 
-        const deletedTask = Task.findOneAndDelete({
+        const deletedTask = await Task.findOneAndDelete({
             _id: taskId,
             userId: userId
-        }, { session });
+        },
+        //  { session }
+        );
 
         if (!deletedTask) {
-            await session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction();
+            // session.endSession();
             return res.status(500).json({
                 success: false,
                 message: 'Failed to delete task'
@@ -93,11 +95,11 @@ const deleteTask = async (req, res) => {
             {
                 $pull: { tasks: deletedTask._id }
             },
-            { session }
+            // { session }
         )
 
-        await session.commitTransaction();
-        session.endSession();
+        // await session.commitTransaction();
+        // session.endSession();
 
         return res.status(200).json({
             success: true,
@@ -107,8 +109,8 @@ const deleteTask = async (req, res) => {
 
     }
     catch (err) {
-        await session.abortTransaction();
-        session.endSession();
+        // await session.abortTransaction();
+        // session.endSession();
         return res.status(500).json({
             success: false,
             message: 'Failed to delete task',

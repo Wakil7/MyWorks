@@ -5,7 +5,7 @@ const getList = createAsyncThunk(
     "task/getAll",
     async({listId}, {rejectWithValue})=>{
         try{
-            const response = await axiosInstance.get(`lists/${listId}`);
+            const response = await axiosInstance.get(`/lists/${listId}`);
             return response.data.list;
         }
         catch (err){
@@ -35,7 +35,7 @@ const deleteTask = createAsyncThunk(
     "task/delete",
     async ({listId, taskId}, {rejectWithValue}) => {
         try{
-            const response = await axiosInstance.delete(`/tasks/${listId}/${taskId}`);
+            const response = await axiosInstance.delete(`/tasks/delete/${listId}/${taskId}`);
             return response.data.task;
         }
         catch (err){
@@ -50,7 +50,7 @@ const updateTask = createAsyncThunk(
     "task/update",
     async ({taskId, name, description}, {rejectWithValue}) => {
         try{
-            const response = await axiosInstance.patch(`/update/${taskId}`, {name, description});
+            const response = await axiosInstance.patch(`/tasks/update/${taskId}`, {name, description});
             return response.data.task;
         }
         catch (err){

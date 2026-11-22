@@ -1,7 +1,8 @@
+import ConfirmModal from './ConfirmModal';
 
-export default function ListItem({ number, name, onEdit, onDelete }) {
+export default function Item({ number, name, onEdit, onDelete, onClick }) {
     return (
-        <div className="list-item d-flex align-items-center justify-content-between">
+        <div className="list-item d-flex align-items-center justify-content-between" onClick={onClick}>
 
             <div className="d-flex align-items-center gap-4">
                 <span className="list-number">{number}.</span>

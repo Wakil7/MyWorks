@@ -35,7 +35,7 @@ const changeListName = createAsyncThunk(
     "list/changeName",
     async ({listId, name}, {rejectWithValue})=>{
         try{
-            const response = await axios.patch(`/lists/change-name/${listId}`, {name});
+            const response = await axiosInstance.patch(`/lists/change-name/${listId}`, {name});
             return response.data.list;
         }
         catch (err){

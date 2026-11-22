@@ -100,8 +100,7 @@ const changeListName = async(req, res) => {
     catch(err){
         return res.status(500).json({
             success: false,
-            message: 'Error changing list name',
-            error: err.message
+            message: err.message,
         });
     }
 }
