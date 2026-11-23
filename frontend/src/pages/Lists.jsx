@@ -1,12 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import ListItem from '../components/Item.jsx';
-import TextInput from '../components/TextInput';
+import ListItem from '../components/Item';
 import PrimaryButton from '../components/PrimaryButton';
 import ConfirmModal from '../components/ConfirmModal';
-import ListEditModal from '../components/ListEditModal'
+import ListInputModal from '../components/ListInputModal.jsx'
 import {
     getAllLists,
     addList,
@@ -24,9 +22,9 @@ export default function Lists() {
     const [listName, setListName] = useState("");
     const [selectedListId, setSelectedListId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [showListModal, setShowListModal] = useState(false);
+    const [isEditList, setIsEditList] = useState(false);
 
-    const [editListName, setEditListName] = useState("");
 
     useEffect(()=>{
         dispatch(getAllLists());
@@ -53,27 +51,37 @@ export default function Lists() {
         navigate(`/tasks/${listId}`);
     }
 
-    const handleEditClick = (listId, name) => {
+    const handleEditClick = (e, listId, name) => {
         // console.log("Edit List:", id);
+        e.stopPropagation();
+        setIsEditList(true);
         setSelectedListId(listId);
-        setEditListName(name);
-        setShowEditModal(true);
+        setListName(name);
+        setShowListModal(true);
     };
 
-    const handleConfirmEdit = () => {
-        dispatch(changeListName({listId: selectedListId, name: editListName}));
+    const handleConfirmList = () => {
+        if (isEditList){
+            dispatch(changeListName({listId: selectedListId, name: listName}));
+        }
+        else{
+            dispatch(addList({name: listName}));
+        }
         setSelectedListId(null);
-        setEditListName("");
-        setShowEditModal(false);
+        setListName("");
+        setIsEditList(false);
+        setShowListModal(false);
     }
 
-    const handleCancelEdit = () => {
+    const handleCancelList = () => {
         setSelectedListId(null);
-        setEditListName("");
-        setShowEditModal(false);
+        setListName("");
+        setIsEditList(false);
+        setShowListModal(false);
     }
 
-    const handleDeleteClick = (listId) => {
+    const handleDeleteClick = (e, listId) => {
+        e.stopPropagation();
         setSelectedListId(listId);
         setShowDeleteModal(true);
     };
@@ -93,26 +101,24 @@ export default function Lists() {
         setListName(e.target.value);
     }
 
-    const handleEditInputChange = (e) => {
-        setEditListName(e.target.value);
-    }
 
-    const handleAddList = async()=>{
-        dispatch(addList({name: listName}));
+    const handleAddClick = async()=>{
+        setIsEditList(false);
         setListName("");
+        setShowListModal(true);
     }
 
     return (
         <div className="container-fluid py-5">
 
             <div className="container">
-                <TextInput
+                {/* <TextInput
                     label="Add List"
                     placeholder="Type your list name here"
                     value = {listName}
                     onChange = {handleInputChange}
-                />
-                <PrimaryButton onClick={handleAddList}>
+                /> */}
+                <PrimaryButton onClick={handleAddClick}>
                     Add
                 </PrimaryButton>
             </div>
@@ -128,8 +134,8 @@ export default function Lists() {
                         key={list._id}
                         number={index + 1}
                         name={list.name}
-                        onEdit={() => handleEditClick(list._id, list.name)}
-                        onDelete={() => handleDeleteClick(list._id)}
+                        onEdit={(e) => handleEditClick(e, list._id, list.name)}
+                        onDelete={(e) => handleDeleteClick(e, list._id)}
                         onClick={() => handleOnListClick(list._id)}
                     />
                 ))}
@@ -150,14 +156,15 @@ export default function Lists() {
                 onCancel={handleCancelDelete}
             ></ConfirmModal>
 
-            <ListEditModal
-                isOpen={showEditModal}
-                title="Edit List"
-                onConfirm={handleConfirmEdit}
-                onCancel={handleCancelEdit}
-                inputOnChange={handleEditInputChange}
-                inputValue={editListName}
-            ></ListEditModal>
+            <ListInputModal
+                isOpen={showListModal}
+                title={isEditList? "Edit List": "Add List"}
+                onConfirm={handleConfirmList}
+                onCancel={handleCancelList}
+                inputOnChange={handleInputChange}
+                inputValue={listName}
+            ></ListInputModal>
+
 
         </div>
     );

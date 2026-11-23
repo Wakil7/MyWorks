@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import TaskItem from '../components/Item.jsx';
+import TaskItem from '../components/Item';
 import TextInput from '../components/TextInput';
 import PrimaryButton from '../components/PrimaryButton';
 import ConfirmModal from '../components/ConfirmModal';
-import ListEditModal from '../components/ListEditModal'
+import TaskInputModal from '../components/TaskInputModal';
+
 import {
     getList,
     addTask,
@@ -25,13 +26,22 @@ export default function Tasks(){
     const [selectedTaskId, setSelectedTaskId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+    const [showTaskModal, setShowTaskModal] = useState(false);
+    const [isEditTask, setIsEditTask] = useState(false);
+
+    const [taskData, setTaskData] = useState({
+        name: '',
+        description: ''
+    });
+
     useEffect(()=>{
         if (listId){
             dispatch(getList({listId}));
         }
     }, [listId]);
 
-    const handleDeleteClick = (taskId) => {
+    const handleDeleteClick = (e, taskId) => {
+        e.stopPropagation();
         setSelectedTaskId(taskId);
         setShowDeleteModal(true);
     }
@@ -47,21 +57,52 @@ export default function Tasks(){
         setShowDeleteModal(false);
     }
 
+    const handleInputChange = (e) => {
+        setTaskData({...taskData, [e.target.name]:e.target.value});
+    }
 
+    const handleAddClick = () => {
+        setIsEditTask(false);
+        setTaskData({name: '', description: ''});
+        setShowTaskModal(true);
+    }
+
+    const handleEditClick = (e, task) => {
+        e.stopPropagation();
+        setIsEditTask(true);
+        setSelectedTaskId(task._id);
+        setTaskData({name: task.name, description: task.description});
+        setShowTaskModal(true);
+    }
+
+    const handleConfirmTask = () => {
+        if (isEditTask){
+            dispatch(updateTask({...taskData, taskId: selectedTaskId}));
+        }
+        else{
+            dispatch(addTask({...taskData, listId}));
+        }
+        setSelectedTaskId(null);
+        setTaskData({name: '', description: ''});
+        setIsEditTask(false);
+        setShowTaskModal(false);
+    }
+
+    const handleCancelTask = () => {
+        setSelectedTaskId(null);
+        setTaskData({name: '', description: ''});
+        setIsEditTask(false);
+        setShowTaskModal(false);
+    }
 
     return (
         <div className="container-fluid py-5">
 
             <div className="container">
-                {/* <TextInput
-                    label="Add List"
-                    placeholder="Type your list name here"
-                    value = {listName}
-                    onChange = {handleInputChange}
-                />
-                <PrimaryButton onClick={handleAddList}>
-                    Add
-                </PrimaryButton> */}
+                
+                <PrimaryButton onClick={handleAddClick}>
+                   Add
+                </PrimaryButton>
             </div>
 
             <h2 className="text-center mb-4">
@@ -75,8 +116,8 @@ export default function Tasks(){
                         key={task._id}
                         number={index + 1}
                         name={task.name}
-                        onEdit={() => handleEditClick(task._id, task.name)}
-                        onDelete={() => handleDeleteClick(task._id)}
+                        onEdit={(e) => handleEditClick(e, task)}
+                        onDelete={(e) => handleDeleteClick(e, task._id)}
                     />
                 ))}
 
@@ -96,16 +137,16 @@ export default function Tasks(){
                 onCancel={handleCancelDelete}
             ></ConfirmModal>
 
-            {/*
+            
 
-            <ListEditModal
-                isOpen={showEditModal}
-                title="Edit List"
-                onConfirm={handleConfirmEdit}
-                onCancel={handleCancelEdit}
-                inputOnChange={handleEditInputChange}
-                inputValue={editListName}
-            ></ListEditModal> */}
+            <TaskInputModal
+                isOpen={showTaskModal}
+                title="Edit Task"
+                onConfirm={handleConfirmTask}
+                onCancel={handleCancelTask}
+                inputOnChange={handleInputChange}
+                inputValue={taskData}
+            ></TaskInputModal>
 
         </div>
     );

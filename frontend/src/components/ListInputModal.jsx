@@ -1,6 +1,6 @@
 import TextInput from './TextInput';
 
-const ListEditModal = ({ isOpen, title, onConfirm, onCancel, inputOnChange, inputValue }) => {
+const ListInputModal = ({ isOpen, title, onConfirm, onCancel, inputOnChange, inputValue }) => {
     if (!isOpen) return null;
 
     return (
@@ -24,8 +24,9 @@ const ListEditModal = ({ isOpen, title, onConfirm, onCancel, inputOnChange, inpu
 
                     <div className="modal-body">
                         <TextInput
-                            label="Edit List Name"
+                            label="Name"
                             placeholder="Type list name here..."
+                            name="name"
                             onChange={inputOnChange}
                             value={inputValue}
                         ></TextInput>
@@ -53,4 +54,4 @@ const ListEditModal = ({ isOpen, title, onConfirm, onCancel, inputOnChange, inpu
     );
 };
 
-export default ListEditModal;
+export default ListInputModal;
