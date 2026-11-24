@@ -175,12 +175,13 @@ const toggleTaskCompleted = async (req, res) => {
             [
                 {
                     $set: {
-                        isCompleted: { $not: 'isCompleted' }
+                        isCompleted: { $not: ['$isCompleted'] }
                     }
                 }
             ],
             {
-                new: true
+                new: true,
+                updatePipeline: true
             });
 
         if (!updatedTask) {

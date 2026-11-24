@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import TaskItem from '../components/Item';
-import TextInput from '../components/TextInput';
+import TaskDisplayModal from '../components/TaskDisplayModal';
 import PrimaryButton from '../components/PrimaryButton';
 import ConfirmModal from '../components/ConfirmModal';
 import TaskInputModal from '../components/TaskInputModal';
@@ -12,7 +12,6 @@ import {
     addTask,
     deleteTask,
     updateTask,
-    toggleCompleted
 } from '../features/data/taskSlice.js';
 
 export default function Tasks(){
@@ -25,7 +24,7 @@ export default function Tasks(){
 
     const [selectedTaskId, setSelectedTaskId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+    const [showTaskDisplay, setShowTaskDisplay] = useState(false);
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [isEditTask, setIsEditTask] = useState(false);
 
@@ -95,6 +94,18 @@ export default function Tasks(){
         setShowTaskModal(false);
     }
 
+    const handleTaskClick = (e, task) => {
+        setSelectedTaskId(task._id);
+        setTaskData({name: task.name, description: task.description});
+        setShowTaskDisplay(true);
+    }
+
+    const handleTaskDisplayCancel = () => {
+        setSelectedTaskId(null);
+        setTaskData({name: '', description: ''});
+        setShowTaskDisplay(false);
+    }
+
     return (
         <div className="container-fluid py-5">
 
@@ -114,10 +125,12 @@ export default function Tasks(){
                 {tasks.map((task, index) => (
                     <TaskItem
                         key={task._id}
+                        taskId={task._id}
                         number={index + 1}
                         name={task.name}
                         onEdit={(e) => handleEditClick(e, task)}
                         onDelete={(e) => handleDeleteClick(e, task._id)}
+                        onClick={(e)=> handleTaskClick(e, task)}
                     />
                 ))}
 
@@ -147,6 +160,12 @@ export default function Tasks(){
                 inputOnChange={handleInputChange}
                 inputValue={taskData}
             ></TaskInputModal>
+
+            <TaskDisplayModal
+                isOpen={showTaskDisplay}
+                taskData={taskData}
+                onCancel={handleTaskDisplayCancel}
+            ></TaskDisplayModal>
 
         </div>
     );

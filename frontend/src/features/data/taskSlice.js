@@ -165,12 +165,17 @@ const taskSlice = createSlice({
 
         .addCase(toggleCompleted.pending, (state, action)=>{
             state.loading = true;
-            state.tasks = state.tasks.map(task => task._id===action.payload._id?action.payload:task);
             state.error = null;
         })
 
         .addCase(toggleCompleted.fulfilled, (state, action)=>{
             state.loading = false;
+            state.tasks = state.tasks.map(task => task._id===action.payload._id?action.payload:task);
+            state.error = null;
+        })
+
+        .addCase(toggleCompleted.rejected, (state, action)=>{
+            state.loading=false;
             state.error = action.payload;
         })
 
