@@ -10,7 +10,7 @@ export default function ForgotPassword() {
     const [formData, setFormData] = useState({
         email: '',
         bestFriendName: '',
-        newPassword: ''
+        password: ''
     });
 
     const navigate = useNavigate();
@@ -77,13 +77,13 @@ export default function ForgotPassword() {
                                 <FormInput
                                     label="New Password"
                                     type="password"
-                                    name="newPassword"
+                                    name="password"
                                     placeholder="Enter your new password"
-                                    value={formData.newPassword}
+                                    value={formData.password}
                                     onChange={handleChange}
                                 />
 
-                                <PrimaryButton>
+                                <PrimaryButton type="submit">
                                     Update Password
                                 </PrimaryButton>
 

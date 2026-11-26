@@ -7,6 +7,7 @@ import Login from './pages/Login.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import Lists from './pages/Lists.jsx';
 import Tasks from './pages/Tasks.jsx';
+import Profile from './pages/Profile.jsx';
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/" element={<Lists />}/>
                     <Route path="/tasks/:listId" element={<Tasks/>}/>
+                    <Route path="/profile" element={<Profile/>}/>
                 </Route>
                 <Route path="/signup" element={<SignUp/>}/>
                 <Route path="/login" element={<Login/>}/>

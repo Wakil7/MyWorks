@@ -4,7 +4,7 @@ import { Provider, useDispatch } from 'react-redux';
 // import { BrowserRouter } from 'react-router-dom';
 
 import { store } from './app/store.js';
-import { checkAuth } from './features/auth/authSlice.js';
+import { getProfile } from './features/auth/authSlice.js';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -16,7 +16,7 @@ function AuthInitializer({children}) {
   const dispatch = useDispatch();
 
   useEffect(()=>{
-    dispatch(checkAuth());
+    dispatch(getProfile());
   }, [dispatch]);
 
   return children;

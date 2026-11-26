@@ -97,7 +97,10 @@ const loginUser = async(req, res) => {
             message: 'Login successful',
             user: {
                 userId: user._id,
-                firstName: user.firstName
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                bestFriendName: user.bestFriendName
             }
         });
     }
@@ -126,6 +129,7 @@ const getProfile = async(req, res) => {
             success: true,
             message: 'Profile fetched successfully',
             user: {
+                userId: user._id,
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
@@ -205,8 +209,9 @@ const changePassword = async(req, res) => {
     try{
         const {email, bestFriendName, password} = req.body;
 
+
         if (!email || !bestFriendName || !password){
-            return req.status(400).json({
+            return res.status(400).json({
                 success: false,
                 message: 'Fields cannot be left blank'
             });
@@ -214,7 +219,7 @@ const changePassword = async(req, res) => {
 
         const user = await User.findOne({email: email});
         if (!user){
-            return req.status(404).json({
+            return res.status(404).json({
                 success: false,
                 message: 'Email not registered'
             });
@@ -253,8 +258,7 @@ const changePassword = async(req, res) => {
     catch (err){
         res.status(500).json({
             success: false,
-            message: 'Error changing password',
-            error: err.message
+            message: err.message,
         });
     }
 };

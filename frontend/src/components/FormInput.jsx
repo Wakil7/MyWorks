@@ -6,7 +6,8 @@ export default function FormInput({
     placeholder,
     value,
     onChange,
-    required = true
+    required = true,
+    readOnly = false,
 }) {
     return (
         <div className="mb-3">
@@ -23,6 +24,7 @@ export default function FormInput({
                 value={value}
                 onChange={onChange}
                 required={required}
+                readOnly={readOnly}
             />
         </div>
     );

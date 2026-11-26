@@ -1,8 +1,8 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import axiosInstance from '../../api/axiosInstance.js';
 
-const checkAuth = createAsyncThunk(
-    "auth/checkAuth",
+const getProfile = createAsyncThunk(
+    "auth/getProfile",
     async (_, {rejectWithValue}) => {
         try{
             const response = await axiosInstance.get("/user/profile");
@@ -80,19 +80,19 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
 
-        .addCase(checkAuth.pending, (state)=>{
+        .addCase(getProfile.pending, (state)=>{
             state.loading = true;
             state.error = null;
         })
 
-        .addCase(checkAuth.fulfilled, (state, action)=>{
+        .addCase(getProfile.fulfilled, (state, action)=>{
             state.user = {...state.user, ...action.payload};
             state.isAuthenticated = true;
             state.loading = false;
             state.error = null;
         })
 
-        .addCase(checkAuth.rejected, (state)=>{
+        .addCase(getProfile.rejected, (state)=>{
             state.user = null;
             state.isAuthenticated = false;
             state.loading = false;
@@ -105,7 +105,7 @@ const authSlice = createSlice({
         })
 
         .addCase(loginUser.fulfilled, (state, action)=>{
-            state.user = action.payload;
+            state.user = {...state.user, ...action.payload};
             state.isAuthenticated = true;
             state.loading = false;
             state.error = null;
@@ -158,9 +158,10 @@ const authSlice = createSlice({
 
 export const { clearAuthError } = authSlice.actions;
 export {
-    checkAuth,
+    getProfile,
     loginUser,
-    logoutUser
+    logoutUser,
+    updateProfile
 };
 
 export default authSlice.reducer;
