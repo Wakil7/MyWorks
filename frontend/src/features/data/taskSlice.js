@@ -21,7 +21,7 @@ const addTask = createAsyncThunk(
     async ({listId, name, description}, {rejectWithValue}) => {
         try{
             const response = await axiosInstance.post(`/tasks/add/${listId}`, {name, description});
-            return response.data.task;
+            return response.data;
         }
         catch (err){
             return rejectWithValue(
@@ -36,7 +36,7 @@ const deleteTask = createAsyncThunk(
     async ({listId, taskId}, {rejectWithValue}) => {
         try{
             const response = await axiosInstance.delete(`/tasks/delete/${listId}/${taskId}`);
-            return response.data.task;
+            return response.data;
         }
         catch (err){
             return rejectWithValue(
@@ -51,7 +51,7 @@ const updateTask = createAsyncThunk(
     async ({taskId, name, description}, {rejectWithValue}) => {
         try{
             const response = await axiosInstance.patch(`/tasks/update/${taskId}`, {name, description});
-            return response.data.task;
+            return response.data;
         }
         catch (err){
             return rejectWithValue(
@@ -66,7 +66,7 @@ const toggleCompleted = createAsyncThunk(
     async ({taskId}, {rejectWithValue}) => {
         try{
             const response = await axiosInstance.patch(`/tasks/toggle-completed/${taskId}`);
-            return response.data.task;
+            return response.data;
         }
         catch (err){
             return rejectWithValue(
@@ -83,6 +83,7 @@ const taskSlice = createSlice({
         listId: null,
         tasks: [],
         loading: true,
+        message: null,
         error: null
     },
 
@@ -100,6 +101,7 @@ const taskSlice = createSlice({
 
         .addCase(getList.pending, (state)=>{
             state.loading = true;
+            state.message = null;
             state.error = null;
         })
 
@@ -112,70 +114,83 @@ const taskSlice = createSlice({
 
         .addCase(getList.rejected, (state, action)=>{
             state.loading = false;
+            state.message = null;
             state.error = action.payload;
         })
 
         .addCase(addTask.pending, (state, action)=>{
             state.loading = true;
+            state.message = null;
             state.error = null;
         })
 
         .addCase(addTask.fulfilled, (state, action)=>{
             state.loading = false;
-            state.tasks.push(action.payload);
+            state.tasks.push(action.payload.task);
+            state.message = action.payload.message;
             state.error = null;
         })
 
         .addCase(addTask.rejected, (state, action)=>{
             state.loading = false;
+            state.message = null;
             state.error = action.payload;
         })
 
         .addCase(deleteTask.pending, (state)=>{
             state.loading = true;
+            state.message = null;
             state.error = null;
         })
 
         .addCase(deleteTask.fulfilled, (state, action)=>{
             state.loading = false;
-            state.tasks = state.tasks.filter(task => task._id!==action.payload._id);
+            state.tasks = state.tasks.filter(task => task._id!==action.payload.task._id);
+            state.message = action.payload.message;
             state.error = null;
         })
 
         .addCase(deleteTask.rejected, (state, action)=>{
             state.loading = false;
+            state.message = null;
             state.error = action.payload;
         })
 
         .addCase(updateTask.pending, (state, action)=>{
             state.loading = true;
+            state.message = null;
             state.error = null;
         })
 
         .addCase(updateTask.fulfilled, (state, action)=>{
             state.loading = false;
-            state.tasks = state.tasks.map(task => task._id === action.payload._id?action.payload:task);
+            state.tasks = state.tasks.map(task => task._id === action.payload.task._id?action.payload.task:task);
+            state.message = action.payload.message;
             state.error = null;
         })
 
         .addCase(updateTask.rejected, (state, action)=>{
             state.loading = false;
+            state.message = null;
             state.error = action.payload;
         })
 
         .addCase(toggleCompleted.pending, (state, action)=>{
             state.loading = true;
+            state.message = null;
             state.error = null;
         })
 
         .addCase(toggleCompleted.fulfilled, (state, action)=>{
             state.loading = false;
-            state.tasks = state.tasks.map(task => task._id===action.payload._id?action.payload:task);
+            state.tasks = state.tasks.map(task => task._id===action.payload.task._id?action.payload.task:task);
+            state.message = action.payload.message;
             state.error = null;
         })
 
         .addCase(toggleCompleted.rejected, (state, action)=>{
             state.loading=false;
+            state.message = null;
             state.error = action.payload;
         })
 

@@ -1,45 +1,58 @@
 
 import { useState } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {loginUser} from '../features/auth/authSlice.js';
-import {useNavigate, Link} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../features/auth/authSlice.js';
+import { useNavigate, Link } from 'react-router-dom';
 // import api from '../api/axiosInstance.js'
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
+
+import { useToast } from '../components/CustomToast';
 
 export default function Login() {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const {loading, error} = useSelector(
+    const showToast = useToast();
+
+    const { loading, message, error } = useSelector(
         (state) => state.auth
     );
 
     const [formData, setFormData] = useState({
         email: '',
-        password: '' 
+        password: ''
     });
 
+    useEffect(() => {
+        if (message) {
+            showToast(message, "success");
+        }
+        if (error) {
+            showToast(error, "error")
+        }
+    }, [message, error]);
+
     const onChange = (e) => {
-        setFormData((prevData)=>{
-            return {...prevData, [e.target.name]:e.target.value};
+        setFormData((prevData) => {
+            return { ...prevData, [e.target.name]: e.target.value };
         })
     }
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        try{
+        try {
             await dispatch(
                 loginUser(formData)
             ).unwrap();
-            navigate("/", {replace: true});
+            navigate("/", { replace: true });
         }
-        catch (err){
+        catch (err) {
             console.error(err);
         }
     };
-   
+
 
     return (
         <div className="container py-5">

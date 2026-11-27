@@ -3,7 +3,8 @@ import { useState } from 'react';
 import {useNavigate, Link} from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
-import api from '../api/axiosInstance.js'
+import axiosInstance from '../api/axiosInstance.js';
+import { useToast } from '../components/CustomToast';
 
 export default function SignUp() {
 
@@ -17,6 +18,8 @@ export default function SignUp() {
 
     const navigate = useNavigate();
 
+    const showToast = useToast();
+
     const onChange = (e) => {
         setFormData((prevData)=>{
             return {...prevData, [e.target.name]:e.target.value};
@@ -28,19 +31,12 @@ export default function SignUp() {
         // console.log(formData);
 
         try{
-            const response = await api.post('/user/register', formData);
-            
-            if (response.data.success){
-                navigate('/login');
-                console.log(response.data.message);
-            }
-            else{
-                console.log('Error');
-            }
-
+            const response = await axiosInstance.post('/user/register', formData);
+            showToast(response.data.message, "success");
+            navigate('/login');
         }
         catch (error){
-            console.log(error.response.data.message);
+            showToast(error.response?.data?.message || "Sign up failed");
         }
 
     }

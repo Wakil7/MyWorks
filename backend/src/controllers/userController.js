@@ -3,18 +3,18 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import cookieOptions from '../utils/cookieOptions.js';
 
-const registerUser = async(req, res) => {
-    try{
-        const {email, password, firstName, lastName, bestFriendName} = req.body;
-        if (!email || !password || !firstName || !lastName || !bestFriendName){
+const registerUser = async (req, res) => {
+    try {
+        const { email, password, firstName, lastName, bestFriendName } = req.body;
+        if (!email || !password || !firstName || !lastName || !bestFriendName) {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required'
             });
         }
 
-        const existingUser = await User.findOne({email: email});
-        if (existingUser){
+        const existingUser = await User.findOne({ email: email });
+        if (existingUser) {
             return res.status(409).json({
                 success: false,
                 message: 'This email is already registered'
@@ -37,7 +37,7 @@ const registerUser = async(req, res) => {
             message: 'Registration successful',
         });
     }
-    catch (err){
+    catch (err) {
         return res.status(500).json({
             success: false,
             message: 'Registration failed',
@@ -47,20 +47,20 @@ const registerUser = async(req, res) => {
 };
 
 
-const loginUser = async(req, res) => {
-    try{
-        const {email, password} = req.body;
-        if (!email || !password){
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required'
             });
         }
 
-        
-        const user = await User.findOne({email: email});
 
-        if (!user){
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
             return res.status(401).json({
                 success: false,
                 message: 'Email is not registered'
@@ -69,7 +69,7 @@ const loginUser = async(req, res) => {
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-        if (!isPasswordCorrect){
+        if (!isPasswordCorrect) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid email or password'
@@ -84,12 +84,12 @@ const loginUser = async(req, res) => {
         const token = jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            {expiresIn: process.env.JWT_EXPIRES_IN}
+            { expiresIn: process.env.JWT_EXPIRES_IN }
         );
 
         res.cookie("accessToken", token, {
             ...cookieOptions,
-            maxAge: 7*24*60*60*1000
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         return res.status(200).json({
@@ -104,7 +104,7 @@ const loginUser = async(req, res) => {
             }
         });
     }
-    catch (err){
+    catch (err) {
         return res.status(500).json({
             success: false,
             message: 'Some unexpected error occurred',
@@ -113,12 +113,12 @@ const loginUser = async(req, res) => {
     }
 };
 
-const getProfile = async(req, res) => {
-    try{
+const getProfile = async (req, res) => {
+    try {
         const userId = req.user.id;
 
         const user = await User.findById(userId);
-        if (!user){
+        if (!user) {
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
@@ -137,7 +137,7 @@ const getProfile = async(req, res) => {
             }
         })
     }
-    catch(err){
+    catch (err) {
         return res.status(500).json({
             success: false,
             message: 'Error while fetching user profile',
@@ -146,21 +146,30 @@ const getProfile = async(req, res) => {
     }
 };
 
-const logoutUser = async(req, res) => {
-    res.clearCookie("accessToken", cookieOptions);
+const logoutUser = async (req, res) => {
+    try {
+        res.clearCookie("accessToken", cookieOptions);
 
-    res.status(200).json({
-        success: true,
-        message: "Logout Successful"
-    });
+        return res.status(200).json({
+            success: true,
+            message: "Logout Successful"
+        });
+    }
+    catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: "Some error occurred",
+            error: err.message
+        })
+    }
 };
 
-const updateProfile = async(req, res) => {
-    try{
+const updateProfile = async (req, res) => {
+    try {
         const userId = req.user.id;
-        const {firstName, lastName, bestFriendName} = req.body;
+        const { firstName, lastName, bestFriendName } = req.body;
 
-        if (!firstName || !lastName || !bestFriendName){
+        if (!firstName || !lastName || !bestFriendName) {
             return res.status(400).json({
                 success: false,
                 message: 'Fields cannot be left blank'
@@ -176,10 +185,10 @@ const updateProfile = async(req, res) => {
                     bestFriendName: bestFriendName
                 }
             },
-            {new: true, runValidators: true}
+            { new: true, runValidators: true }
         );
 
-        if (!updatedUser){
+        if (!updatedUser) {
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
@@ -188,7 +197,7 @@ const updateProfile = async(req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: 'User profile updated successfully',
+            message: 'Profile updated successfully',
             user: {
                 firstName: firstName,
                 lastName: lastName,
@@ -196,7 +205,7 @@ const updateProfile = async(req, res) => {
             }
         });
     }
-    catch (err){
+    catch (err) {
         res.status(500).json({
             success: false,
             message: 'Error updating profile',
@@ -205,27 +214,27 @@ const updateProfile = async(req, res) => {
     }
 };
 
-const changePassword = async(req, res) => {
-    try{
-        const {email, bestFriendName, password} = req.body;
+const changePassword = async (req, res) => {
+    try {
+        const { email, bestFriendName, password } = req.body;
 
 
-        if (!email || !bestFriendName || !password){
+        if (!email || !bestFriendName || !password) {
             return res.status(400).json({
                 success: false,
                 message: 'Fields cannot be left blank'
             });
         }
 
-        const user = await User.findOne({email: email});
-        if (!user){
+        const user = await User.findOne({ email: email });
+        if (!user) {
             return res.status(404).json({
                 success: false,
                 message: 'Email not registered'
             });
         }
 
-        if (bestFriendName.trim().toLowerCase()==user.bestFriendName.trim().toLowerCase()){
+        if (bestFriendName.trim().toLowerCase() == user.bestFriendName.trim().toLowerCase()) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             const updatedUser = await User.findByIdAndUpdate(
@@ -235,9 +244,9 @@ const changePassword = async(req, res) => {
                         password: hashedPassword
                     }
                 },
-                {new: true, runValidators: true}
+                { new: true, runValidators: true }
             );
-            if (!updatedUser){
+            if (!updatedUser) {
                 return res.status(500).json({
                     success: false,
                     message: 'Password update failed'
@@ -248,14 +257,14 @@ const changePassword = async(req, res) => {
                 message: 'Password updated successfully'
             });
         }
-        else{
+        else {
             return res.status(400).json({
                 success: false,
                 message: 'Best friend name does not match'
             });
         }
     }
-    catch (err){
+    catch (err) {
         res.status(500).json({
             success: false,
             message: err.message,

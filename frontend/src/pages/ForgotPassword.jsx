@@ -4,8 +4,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import PrimaryButton from '../components/PrimaryButton';
 import axiosInstance from '../api/axiosInstance.js';
+import { useToast } from '../components/CustomToast';
 
 export default function ForgotPassword() {
+
+    const showToast = useToast();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -27,11 +30,11 @@ export default function ForgotPassword() {
 
         try{
             const response = await axiosInstance.post("/user/change-password", formData);
-            console.log(response.data.message);
+            showToast(response.data.message, "success")
             navigate("/login");
         }
         catch (err){
-            console.log(err.response?.data?.message || "Failed to update password");
+            showToast(err.response?.data?.message || "Failed to update password", "error");
         }
         
 

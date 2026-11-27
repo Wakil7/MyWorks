@@ -6,7 +6,7 @@ import TaskDisplayModal from '../components/TaskDisplayModal';
 import PrimaryButton from '../components/PrimaryButton';
 import ConfirmModal from '../components/ConfirmModal';
 import TaskInputModal from '../components/TaskInputModal';
-
+import { useToast } from '../components/CustomToast';
 import {
     getList,
     addTask,
@@ -19,8 +19,9 @@ export default function Tasks(){
     const { listId } = useParams();
 
     const dispatch = useDispatch();
+    const showToast = useToast();
 
-    const { tasks, loading, error } = useSelector((state)=>state.task);
+    const { tasks, loading, message, error } = useSelector((state)=>state.task);
 
     const [selectedTaskId, setSelectedTaskId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -38,6 +39,15 @@ export default function Tasks(){
             dispatch(getList({listId}));
         }
     }, [listId]);
+
+    useEffect(() => {
+        if (message) {
+            showToast(message, "success");
+        }
+        if (error) {
+            showToast(error, "error")
+        }
+    }, [message, error]);
 
     const handleDeleteClick = (e, taskId) => {
         e.stopPropagation();

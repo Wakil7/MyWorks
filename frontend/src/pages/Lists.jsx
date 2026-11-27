@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import ListItem from '../components/Item';
 import PrimaryButton from '../components/PrimaryButton';
 import ConfirmModal from '../components/ConfirmModal';
-import ListInputModal from '../components/ListInputModal.jsx'
+import ListInputModal from '../components/ListInputModal';
+import { useToast } from '../components/CustomToast';
 import {
     getAllLists,
     addList,
@@ -14,10 +15,12 @@ import {
 
 export default function Lists() {
 
+    const showToast = useToast();
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { user } = useSelector((state) => state.auth);
-    const { lists, loading, error } = useSelector((state) => state.list);
+    const { lists, loading, message, error } = useSelector((state) => state.list);
 
     const [listName, setListName] = useState("");
     const [selectedListId, setSelectedListId] = useState(null);
@@ -29,6 +32,15 @@ export default function Lists() {
     useEffect(()=>{
         dispatch(getAllLists());
     }, []);
+
+    useEffect(()=>{
+        if (message){
+            showToast(message, "success");
+        }
+        if (error){
+            showToast(error, "error")
+        }
+    }, [message, error]);
 
 
     // useEffect(() => {
